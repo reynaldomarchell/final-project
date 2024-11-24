@@ -1,2 +1,2 @@
-# web-prog
+# final-project
 Project AOL Matakuliah Website Programming 
