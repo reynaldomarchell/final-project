@@ -13,7 +13,14 @@ return new class extends Migration
     {
         Schema::create('donations', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger("user_id");
+            $table->unsignedBigInteger("event_id");
+            $table->date("date");
+            $table->integer("amount");
             $table->timestamps();
+
+            $table->foreign("user_id")->references("id")->on("users")->onDelete("cascade");
+            $table->foreign("event_id")->references("id")->on("events")->onDelete("cascade");
         });
     }
 
