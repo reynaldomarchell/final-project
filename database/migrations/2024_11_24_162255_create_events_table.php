@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string("title");
             $table->string("description");
             $table->date("date");
+            $table->integer("donationTotal");
             $table->string("image");
             $table->timestamps();
         });
