@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Event;
 use Illuminate\Http\Request;
 
 class EventController extends Controller
@@ -9,9 +10,10 @@ class EventController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $events = Event::paginate(10);
+        return response()->json($events,200);
     }
 
     /**
@@ -27,7 +29,21 @@ class EventController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validate = $request([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'image' => 'required|string',
+            'date' => 'required|date'
+        ]);
+
+        $newEvent = Event::create([
+            'title' => $validate['title'],
+            'description' => $validate['description'],
+            'date' => $validate['date'],
+            'donationTotal' => 0
+        ]);
+
+        return response()->json($newEvent,201);
     }
 
     /**
@@ -35,7 +51,8 @@ class EventController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $event = Event::findOrFail($id);
+        return response()->json($event,200);
     }
 
     /**
@@ -51,7 +68,20 @@ class EventController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $event = Event::findOrFail($id);
+        $validate = $request([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'date' => 'required|date'
+        ]);
+
+        $event->title = $validate['title'];
+        $event->description = $validate['description'];
+        $event->date = $validate['date'];
+
+        $event->save();
+
+        return response()->json($event,200);
     }
 
     /**
@@ -59,6 +89,9 @@ class EventController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $event = Event::findOrFail($id);
+        $event->delete();
+
+        return response()->json(["message"=>"successfully deleted event"],200);
     }
 }
