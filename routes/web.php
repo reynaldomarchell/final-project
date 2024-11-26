@@ -9,7 +9,7 @@ use App\Http\Middleware\JWTMiddleware;
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\DonatorMiddleware;
 
-Route::get('/', function () {
+Route::get('/csrf', function () {
     return csrf_token();
 });
 

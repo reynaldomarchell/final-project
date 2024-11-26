@@ -44,7 +44,14 @@ class EventController extends Controller
      */
     public function show(string $id)
     {
-        $event = Event::findOrFail($id);
+        $event = Event::with([
+            'donation' => function ($query) {
+                $query->select('id', 'event_id', 'user_id', 'amount', 'date');
+            },
+            'donation.user' => function ($query) {
+                $query->select('id', 'name');
+            }
+        ])->findOrFail($id);
         return response()->json($event,200);
     }
 
