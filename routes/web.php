@@ -3,9 +3,11 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\DonationController;
 use App\Http\Controllers\AuthController;
 use App\Http\Middleware\JWTMiddleware; 
 use App\Http\Middleware\AdminMiddleware;
+use App\Http\Middleware\DonatorMiddleware;
 
 Route::get('/', function () {
     return csrf_token();
@@ -32,5 +34,13 @@ Route::prefix('user')->group(function(){
         Route::get('/', [UserController::class, 'index']); 
         Route::put('/', [UserController::class, 'edit']);
         Route::put('/change-password', [UserController::class, 'changePassword']); 
+    });
+});
+
+Route::prefix('donation')->group(function(){
+    Route::middleware([JWTMiddleware::class, DonatorMiddleware::class])->group(function () {
+        Route::get('/event/{eventId}', [DonationController::class, 'getDonationByEventId']);
+        Route::get('/user', [DonationController::class, 'getDonationByUserId']);
+        Route::post('/', [DonationController::class, 'store']);
     });
 });

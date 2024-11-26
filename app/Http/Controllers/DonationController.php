@@ -1,64 +1,48 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use Illuminate\Http\Request;
+use App\Models\Donation;
+use App\Models\Event;
 
 class DonationController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
+    public function getDonationByEventId(string $eventId){
+        $donations = Donation::where("event_id",$eventId)->get();
+        return response()->json($donations);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+    public function getDonationByUserId(Request $request){
+        $user = $request->user();
+        $donations = Donation::where("user_id",$user->id)->get();
+        return response()->json($donations);
     }
+    
+    public function store(Request $request){
+        $validate = $request->validate([
+            'event_id' => 'required|integer',
+            'amount' => 'required|integer|min:0'
+        ]);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        $getEvent = Event::where("id",$validate['event_id'])->first();
+        if ($getEvent == null){
+            return response()->json(["message"=>"event with id ".$validate['event_id']." doesn't exist"],409);
+        }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $getEvent->donationTotal += $validate['amount'];
+        $getEvent->save();
+        $user = $request->user();
+        
+        $newDonation = Donation::create([
+            'user_id' => $user->id,
+            'event_id' => $validate['event_id'],
+            'amount' => $validate['amount'],
+            'date' => now()
+        ]);
+    
+        return response()->json([
+            "message" => "successfully created new donation",
+            "donation" => $newDonation
+        ]);
     }
 }
