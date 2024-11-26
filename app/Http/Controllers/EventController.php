@@ -29,7 +29,7 @@ class EventController extends Controller
      */
     public function store(Request $request)
     {
-        $validate = $request([
+        $validate = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'image' => 'required|string',
@@ -40,6 +40,7 @@ class EventController extends Controller
             'title' => $validate['title'],
             'description' => $validate['description'],
             'date' => $validate['date'],
+            'image' => $validate['image'],
             'donationTotal' => 0
         ]);
 
@@ -69,14 +70,16 @@ class EventController extends Controller
     public function update(Request $request, string $id)
     {
         $event = Event::findOrFail($id);
-        $validate = $request([
+        $validate = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
+            'image' => 'required|string',
             'date' => 'required|date'
         ]);
 
         $event->title = $validate['title'];
         $event->description = $validate['description'];
+        $event->image = $validate['image'];
         $event->date = $validate['date'];
 
         $event->save();
